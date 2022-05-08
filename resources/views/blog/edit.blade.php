@@ -45,10 +45,55 @@
                 class="uppercase mt-15 bg-blue-500 text-gray-100 text-lg font-extrabold py-4 px-8 rounded-3xl">
                 Submit Post
             </button>
+            <?php
+            $url ='https://pixabay.com/api/';
+
+            $options = array(
+
+                'key' => '27228236-ecacee828bdd0ed754e88ae07',
+                'q'=> 'all',
+                'lang'=>'en',
+                'category'=> 'all',
+                'colors'=> "grayscale", "transparent", "red", "orange", "yellow", "green", "turquoise", "blue", "lilac", "pink", "white", "gray", "black", "brown",
+                'order'=>  "popular",
+
+            );
+
+            $curl= curl_init();
+
+            curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($curl,CURLOPT_URL,$url.'?'.http_build_query($options));
+
+            $response =curl_exec($curl);
+            $data =json_decode($response,true);
+            curl_close($curl);
+
+
+
+            $ids = [];
+
+            array_walk_recursive($data, function($value, $key) use (&$ids){
+                if ($key === "userImageURL") {
+                    function multi_implode($el, $data) {
+                        $my_array=array();
+                        foreach($data as $val)
+                            $my_array[] = is_array($val)? multi_implode($el, $val) : $val;
+                        return implode($el, $my_array);
+                    }
+
+                    $ids[] = $value;
+                }
+
+            });
+
+
+            ?>
+
+
             <button
-                type="submit"
+                type="button"
                 class="uppercase mt-15 bg-blue-500 text-gray-100 text-lg font-extrabold py-4 px-8 rounded-3xl">
-                Search Image
+                <a href="{{$ids}}">Search Image</a>
             </button>
             <button
                 type="submit"
@@ -60,3 +105,4 @@
     </div>
 
 @endsection
+
